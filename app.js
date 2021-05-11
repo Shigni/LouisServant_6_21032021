@@ -5,11 +5,11 @@ const mongoose = require('mongoose');
 const path = require('path');
 
 const helmet = require("helmet");
-//const rateLimit = require("express-rate-limit");
-/*const apiLimiter = rateLimit({
+const rateLimit = require("express-rate-limit");
+const apiLimiter = rateLimit({
     windowMs: 15 * 60 * 1000, // 15 minutes
     max: 10  
-  });*/
+  });
 
 const sauceRoutes = require('./routes/sauce');
 const userRoutes = require ('./routes/user');
@@ -33,7 +33,7 @@ app.use((req, res, next) => {
 
 app.use(bodyParser.json());
 
-//app.use("/api/", apiLimiter);
+app.use("/api/", apiLimiter);
 app.use(helmet());
 
 app.use('/images', express.static(path.join(__dirname, 'images')));
