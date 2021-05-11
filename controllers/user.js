@@ -5,14 +5,19 @@ const User = require('../models/User');
 // Importation du module JWT
 const jwt = require('jsonwebtoken');
 
+var CryptoJS = require("crypto-js");
+
 // Création d'un utilisateur
 exports.signup = (req, res, next) => {
+  //var ciphertext = CryptoJS.AES.encrypt(req.body.email, 'secret key 123').toString();
   // Hashage du mot de passe récupéré dans le formulaire d'inscription
   bcrypt.hash(req.body.password, 10)
     .then(hash => {
       // Création d'un nouvel utilisateur dans la base de donnée
+      
       const user = new User({
         // Récupération de l'adresse mail écrite dans le formulaire d'inscription
+        
         email: req.body.email,
         // Récupération du mot de passe hashé
         password: hash
@@ -27,6 +32,10 @@ exports.signup = (req, res, next) => {
 // Connexion d'un utilisateur  
 exports.login = (req, res, next) => {
   // Recherche de l'utilisateur dans la base de donnée via son email
+  //var ciphertext = CryptoJS.AES.encrypt(req.body.email, 'secret key 123').toString();;
+  //var bytes = CryptoJS.AES.decrypt(ciphertext, 'secret key 123');
+  //var originalEmail = bytes.toString(CryptoJS.enc.Utf8);
+  //console.log(originalEmail);
   User.findOne({ email: req.body.email })
     .then(user => {
       if (!user) {
@@ -42,7 +51,7 @@ exports.login = (req, res, next) => {
             userId: user._id,
             token: jwt.sign(
               { userId: user._id },
-              '79I43u7uz8OZZHXA5MmHnkb8jvYANPcF7YfkKQyOzio',
+              process.env.TOKEN,
               { expiresIn: '24h' }
             )
           });

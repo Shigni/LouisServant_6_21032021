@@ -1,14 +1,22 @@
 const express = require('express');
+require('dotenv').config()
 const bodyParser = require('body-parser');
 const mongoose = require('mongoose');
 const path = require('path');
+
+const helmet = require("helmet");
+//const rateLimit = require("express-rate-limit");
+/*const apiLimiter = rateLimit({
+    windowMs: 15 * 60 * 1000, // 15 minutes
+    max: 10  
+  });*/
 
 const sauceRoutes = require('./routes/sauce');
 const userRoutes = require ('./routes/user');
 
 const app = express();
 
-mongoose.connect('mongodb+srv://Users:DcYTn0BLlRbNojmF@cluster1.rfrvu.mongodb.net/Cluster1?retryWrites=true&w=majority',
+mongoose.connect(process.env.DB,
     {
         useNewUrlParser: true,
         useUnifiedTopology: true
@@ -24,6 +32,9 @@ app.use((req, res, next) => {
 });
 
 app.use(bodyParser.json());
+
+//app.use("/api/", apiLimiter);
+app.use(helmet());
 
 app.use('/images', express.static(path.join(__dirname, 'images')));
 
