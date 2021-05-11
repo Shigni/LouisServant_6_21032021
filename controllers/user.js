@@ -5,12 +5,18 @@ const User = require('../models/User');
 // Importation du module JWT
 const jwt = require('jsonwebtoken');
 
-var CryptoJS = require("crypto-js");
+var crypto = require('crypto');
+var algorithm = 'aes256';
+var token = process.env.TOKENEMAIL;
 
 // Création d'un utilisateur
 exports.signup = (req, res, next) => {
-  //var ciphertext = CryptoJS.AES.encrypt(req.body.email, 'secret key 123').toString();
+  
   // Hashage du mot de passe récupéré dans le formulaire d'inscription
+  var cipher = crypto.createCipher(algorithm, token);
+  var crypted = cipher.update(req.body.email, 'utf8', 'hex');
+  crypted += cipher.final('hex');
+
   bcrypt.hash(req.body.password, 10)
     .then(hash => {
       // Création d'un nouvel utilisateur dans la base de donnée
@@ -18,7 +24,7 @@ exports.signup = (req, res, next) => {
       const user = new User({
         // Récupération de l'adresse mail écrite dans le formulaire d'inscription
         
-        email: req.body.email,
+        email: crypted,
         // Récupération du mot de passe hashé
         password: hash
       });
@@ -32,11 +38,12 @@ exports.signup = (req, res, next) => {
 // Connexion d'un utilisateur  
 exports.login = (req, res, next) => {
   // Recherche de l'utilisateur dans la base de donnée via son email
-  //var ciphertext = CryptoJS.AES.encrypt(req.body.email, 'secret key 123').toString();;
-  //var bytes = CryptoJS.AES.decrypt(ciphertext, 'secret key 123');
-  //var originalEmail = bytes.toString(CryptoJS.enc.Utf8);
-  //console.log(originalEmail);
-  User.findOne({ email: req.body.email })
+  
+  var cipher = crypto.createCipher(algorithm, token);
+  var crypted = cipher.update(req.body.email, 'utf8', 'hex');
+  crypted += cipher.final('hex');
+  
+  User.findOne({ email: crypted })
     .then(user => {
       if (!user) {
         return res.status(401).json({ error: 'Utilisateur non trouvé !' });
