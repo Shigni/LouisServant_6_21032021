@@ -16,7 +16,7 @@ exports.signup = (req, res, next) => {
   var cipher = crypto.createCipher(algorithm, token);
   var crypted = cipher.update(req.body.email, 'utf8', 'hex');
   crypted += cipher.final('hex');
-
+  
   bcrypt.hash(req.body.password, 10)
     .then(hash => {
       // Création d'un nouvel utilisateur dans la base de donnée
